@@ -1,0 +1,51 @@
+name: build driver
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: build drivers against master and release
+    steps:
+    - uses: actions/checkout@v4
+    
+    - run: sudo sh ./.github/scripts/ci.sh init
+
+    - uses: actions/cache@v5
+      id: xm
+      with:
+        path: xserver-master-install 
+        key:  drv-x-master-fbsdx64-${{ hashFiles('**/MASTER_HASH') }}-${{ hashFiles('.github/scripts/ci.sh') }}
+
+    - uses: actions/cache@v5
+      id: xs
+      with:
+        path: xserver-stable-install 
+        key:  drv-x-stable-fbsdx64-${{ hashFiles('**/LATEST_REL_HASH') }}-${{ hashFiles('.github/scripts/ci.sh') }}
+
+    - name: xserver-ccache
+      uses: actions/cache@v5
+      if: ${{ steps.xm.outputs.cache-hit != 'true' ||  steps.xs.outputs.cache-hit != 'true' }}
+      with:
+        path: xserver-ccache-cache
+        key:  drv-x-ccache-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
+
+    - uses: actions/cache@v5
+      with:
+        path: pkg-cache
+        key:  drv-pkg-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
+
+    - uses: actions/cache@v5
+      with:
+        path: |
+          cfg-cache-stable
+          cfg-cache-master
+        key:  drv-cfg-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
+
+    - name: Run in vm
+      uses: vmactions/freebsd-vm@v1
+      with:
+        run: |
+          sh ./.github/scripts/ci.sh
