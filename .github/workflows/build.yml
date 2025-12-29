@@ -1,51 +1,40 @@
-name: build driver
+permissions:
+    contents: write
 
 on:
-  push:
-  pull_request:
+    push:
+    pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: build drivers against master and release
-    steps:
-    - uses: actions/checkout@v4
-    
-    - run: sudo sh ./.github/scripts/ci.sh init
+    # Not supported on Linux and NetBSD
 
-    - uses: actions/cache@v5
-      id: xm
-      with:
-        path: xserver-master-install 
-        key:  drv-x-master-fbsdx64-${{ hashFiles('**/MASTER_HASH') }}-${{ hashFiles('.github/scripts/ci.sh') }}
+    freebsd:
+        strategy:
+            matrix:
+                xserver-version: [ master, xlibre-xserver-25.1.0, xlibre-xserver-25.0.0.18 ]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: X11Libre/action-build-driver/target/freebsd@v0.3.7
+              with:
+                xserver-version: ${{ matrix.xserver-version }}
 
-    - uses: actions/cache@v5
-      id: xs
-      with:
-        path: xserver-stable-install 
-        key:  drv-x-stable-fbsdx64-${{ hashFiles('**/LATEST_REL_HASH') }}-${{ hashFiles('.github/scripts/ci.sh') }}
+    dragonfly:
+        strategy:
+            matrix:
+                # xlibre-xserver-25.0.x not compiling on dragonfly yet
+                xserver-version: [ master, xlibre-xserver-25.1.0 ]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: X11Libre/action-build-driver/target/dragonfly@v0.3.7
+              with:
+                xserver-version: ${{ matrix.xserver-version }}
 
-    - name: xserver-ccache
-      uses: actions/cache@v5
-      if: ${{ steps.xm.outputs.cache-hit != 'true' ||  steps.xs.outputs.cache-hit != 'true' }}
-      with:
-        path: xserver-ccache-cache
-        key:  drv-x-ccache-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
-
-    - uses: actions/cache@v5
-      with:
-        path: pkg-cache
-        key:  drv-pkg-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
-
-    - uses: actions/cache@v5
-      with:
-        path: |
-          cfg-cache-stable
-          cfg-cache-master
-        key:  drv-cfg-fbsdx64-${{ hashFiles('.github/scripts/ci.sh') }}
-
-    - name: Run in vm
-      uses: vmactions/freebsd-vm@v1
-      with:
-        run: |
-          sh ./.github/scripts/ci.sh
+    release-notes:
+        name:    Release pushed tag
+        runs-on: ubuntu-latest
+        if:      ${{ startsWith(github.ref, 'refs/tags/xlibre-') }}
+        needs:   [ freebsd, dragonfly ]
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: X11Libre/action-build-driver/release@v0.3.7
