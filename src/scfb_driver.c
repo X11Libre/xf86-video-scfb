@@ -1061,7 +1061,7 @@ ScfbDGASetMode(ScrnInfoPtr pScrn, DGAModePtr pDGAMode)
 
 	if (!(*pScrn->SwitchMode)(SWITCH_MODE_ARGS(pScrn, pMode)))
 		return FALSE;
-	(*pScrn->AdjustFrame)(ADJUST_FRAME_ARGS(pScrn, frameX0, frameY0));
+	pScrn->AdjustFrame(pScrn, frameX0, frameY0);
 
 	return TRUE;
 }
@@ -1069,7 +1069,7 @@ ScfbDGASetMode(ScrnInfoPtr pScrn, DGAModePtr pDGAMode)
 static void
 ScfbDGASetViewport(ScrnInfoPtr pScrn, int x, int y, int flags)
 {
-	(*pScrn->AdjustFrame)(ADJUST_FRAME_ARGS(pScrn, x, y));
+	pScrn->AdjustFrame(pScrn, x, y);
 }
 
 static int

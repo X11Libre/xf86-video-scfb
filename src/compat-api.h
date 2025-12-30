@@ -35,8 +35,6 @@
 #define CLOSE_SCREEN_ARGS_DECL ScreenPtr pScreen
 #define CLOSE_SCREEN_ARGS pScreen
 
-#define ADJUST_FRAME_ARGS(arg, x, y) arg, x, y
-
 #define SWITCH_MODE_ARGS_DECL ScrnInfoPtr arg, DisplayModePtr mode
 #define SWITCH_MODE_ARGS(arg, m) arg, m
 
