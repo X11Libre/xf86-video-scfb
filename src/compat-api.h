@@ -28,11 +28,6 @@
 #ifndef COMPAT_API_H
 #define COMPAT_API_H
 
-#ifndef XF86_HAS_SCRN_CONV
-#define xf86ScreenToScrn(s) xf86Screens[(s)->myNum]
-#define xf86ScrnToScreen(s) screenInfo.screens[(s)->scrnIndex]
-#endif
-
 #define SCRN_ARG_TYPE ScrnInfoPtr
 #define SCRN_INFO_PTR(arg1) ScrnInfoPtr pScrn = (arg1)
 
