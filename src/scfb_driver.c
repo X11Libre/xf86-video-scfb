@@ -886,9 +886,8 @@ ScfbWindowLinear(ScreenPtr pScreen, CARD32 row, CARD32 offset, int mode,
 }
 
 static void
-ScfbPointerMoved(ScrnInfoPtr arg, int x, int y)
+ScfbPointerMoved(ScrnInfoPtr pScrn, int x, int y)
 {
-    SCRN_INFO_PTR(arg);
     ScfbPtr fPtr = SCFBPTR(pScrn);
     int newX, newY;
 
@@ -920,14 +919,12 @@ ScfbPointerMoved(ScrnInfoPtr arg, int x, int y)
     }
 
     /* Pass adjusted pointer coordinates to wrapped PointerMoved function. */
-    (*fPtr->PointerMoved)(arg, newX, newY);
+    fPtr->PointerMoved(pScrn, newX, newY);
 }
 
 static Bool
-ScfbEnterVT(ScrnInfoPtr arg)
+ScfbEnterVT(ScrnInfoPtr pScrn)
 {
-	SCRN_INFO_PTR(arg);
-
 	TRACE_ENTER("EnterVT");
 	pScrn->vtSema = TRUE;
 	TRACE_EXIT("EnterVT");
@@ -935,34 +932,22 @@ ScfbEnterVT(ScrnInfoPtr arg)
 }
 
 static void
-ScfbLeaveVT(ScrnInfoPtr arg)
+ScfbLeaveVT(ScrnInfoPtr pScrn)
 {
-#if DEBUG
-	SCRN_INFO_PTR(arg);
-#endif
-
 	TRACE_ENTER("LeaveVT");
 }
 
 static Bool
-ScfbSwitchMode(ScrnInfoPtr arg, DisplayModePtr mode)
+ScfbSwitchMode(ScrnInfoPtr pScrn, DisplayModePtr mode)
 {
-#if DEBUG
-	SCRN_INFO_PTR(arg);
-#endif
-
 	TRACE_ENTER("SwitchMode");
 	/* Nothing else to do. */
 	return TRUE;
 }
 
 static int
-ScfbValidMode(ScrnInfoPtr arg, DisplayModePtr mode, Bool verbose, int flags)
+ScfbValidMode(ScrnInfoPtr pScrn, DisplayModePtr mode, Bool verbose, int flags)
 {
-#if DEBUG
-	SCRN_INFO_PTR(arg);
-#endif
-
 	TRACE_ENTER("ValidMode");
 	return MODE_OK;
 }
