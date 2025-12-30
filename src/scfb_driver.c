@@ -1059,7 +1059,7 @@ ScfbDGASetMode(ScrnInfoPtr pScrn, DGAModePtr pDGAMode)
 		frameY0 = pScrn->frameY0;
 	}
 
-	if (!(*pScrn->SwitchMode)(SWITCH_MODE_ARGS(pScrn, pMode)))
+	if (!(pScrn->SwitchMode(pScrn, pMode)))
 		return FALSE;
 	pScrn->AdjustFrame(pScrn, frameX0, frameY0);
 
