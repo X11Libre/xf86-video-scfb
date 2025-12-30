@@ -56,7 +56,7 @@ AC_ARG_WITH(xorg-module-dir,
             [moduledir=`$PKG_CONFIG --variable=moduledir xorg-server`])
 
 # Obtain compiler/linker options for the driver dependencies
-PKG_CHECK_MODULES(XORG, [xorg-server >= 1.0.99.901 xproto $REQUIRED_MODULES])
+PKG_CHECK_MODULES(XORG, [xorg-server >= 25.0 xproto $REQUIRED_MODULES])
 
 AC_SUBST([moduledir])
 
