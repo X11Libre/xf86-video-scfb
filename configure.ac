@@ -74,9 +74,6 @@ CPPFLAGS="$SAVE_CPPFLAGS"
 
 AC_SUBST([moduledir])
 
-DRIVER_NAME=scfb
-AC_SUBST([DRIVER_NAME])
-
 AC_CONFIG_FILES([
                 Makefile
                 src/Makefile
