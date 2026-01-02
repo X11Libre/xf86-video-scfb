@@ -82,7 +82,7 @@
 #endif
 
 /* Prototypes */
-static pointer ScfbSetup(pointer, pointer, int *, int *);
+static void *ScfbSetup(void *, void *, int *, int *);
 static Bool ScfbGetRec(ScrnInfoPtr);
 static void ScfbFreeRec(ScrnInfoPtr);
 static const OptionInfoRec * ScfbAvailableOptions(int, int);
@@ -111,11 +111,10 @@ static Bool ScfbDGASetMode(ScrnInfoPtr, DGAModePtr);
 static void ScfbDGASetViewport(ScrnInfoPtr, int, int, int);
 static Bool ScfbDGAInit(ScrnInfoPtr, ScreenPtr);
 #endif
-static Bool ScfbDriverFunc(ScrnInfoPtr pScrn, xorgDriverFuncOp op,
-				pointer ptr);
+static Bool ScfbDriverFunc(ScrnInfoPtr pScrn, xorgDriverFuncOp op, void *ptr);
 
 /* Helper functions */
-static pointer scfb_mmap(size_t, off_t, int);
+static void *scfb_mmap(size_t, off_t, int);
 
 enum { SCFB_ROTATE_NONE = 0,
        SCFB_ROTATE_CCW = 90,
@@ -179,15 +178,15 @@ static XF86ModuleVersionInfo ScfbVersRec = {
 
 _X_EXPORT XF86ModuleData scfbModuleData = { &ScfbVersRec, ScfbSetup, NULL };
 
-static pointer
-ScfbSetup(pointer module, pointer opts, int *errmaj, int *errmin)
+static void *
+ScfbSetup(void *module, void *opts, int *errmaj, int *errmin)
 {
 	static Bool setupDone = FALSE;
 
 	if (!setupDone) {
 		setupDone = TRUE;
 		xf86AddDriver(&SCFB, module, HaveDriverFuncs);
-		return (pointer)1;
+		return (void*)1;
 	} else {
 		if (errmaj != NULL)
 			*errmaj = LDR_ONCEONLY;
@@ -256,12 +255,12 @@ ScfbIdentify(int flags)
 }
 
 /* Map the framebuffer's memory. */
-static pointer
+static void *
 scfb_mmap(size_t len, off_t off, int fd)
 {
 	int pagemask, mapsize;
 	caddr_t addr;
-	pointer mapaddr;
+	void *mapaddr;
 
 	pagemask = getpagesize() - 1;
 	mapsize = ((int) len + pagemask) & ~pagemask;
@@ -272,10 +271,10 @@ scfb_mmap(size_t len, off_t off, int fd)
 	 * interloper, e.g. another server, can't get this frame buffer,
 	 * and if another server already has it, this one won't.
 	 */
-	mapaddr = (pointer) mmap(addr, mapsize,
+	mapaddr = (void*) mmap(addr, mapsize,
 				 PROT_READ | PROT_WRITE, MAP_SHARED,
 				 fd, off);
-	if (mapaddr == (pointer) -1) {
+	if (mapaddr == (void*) -1) {
 		mapaddr = NULL;
 	}
 #if DEBUG
@@ -1132,8 +1131,7 @@ ScfbDGAInit(ScrnInfoPtr pScrn, ScreenPtr pScreen)
 #endif
 
 static Bool
-ScfbDriverFunc(ScrnInfoPtr pScrn, xorgDriverFuncOp op,
-    pointer ptr)
+ScfbDriverFunc(ScrnInfoPtr pScrn, xorgDriverFuncOp op, void *ptr)
 {
 	xorgHWFlags *flag;
 
