@@ -59,7 +59,9 @@
 #include "colormapst.h"
 #include "xf86cmap.h"
 #include "shadow.h"
+#ifdef XFreeXDGA
 #include "dgaproc.h"
+#endif
 
 /* For visuals */
 #include "fb.h"
