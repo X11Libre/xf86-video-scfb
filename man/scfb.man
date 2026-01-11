@@ -30,7 +30,7 @@
 .ds q \N'34'
 .TH WSFB __drivermansuffix__ __vendorversion__
 .SH NAME
-scfb \- video driver for wsdisplay framebuffer device
+scfb \- video driver for syscons/vt framebuffer device
 .SH SYNOPSIS
 .nf
 .B "Section \*qDevice\*q"
@@ -41,24 +41,25 @@ scfb \- video driver for wsdisplay framebuffer device
 .fi
 .SH DESCRIPTION
 .B scfb
-is an __xservername__ driver for OpenBSD and NetBSD
-wsdisplay framebuffer devices.
+is an __xservername__ driver for FreeBSD and DragonFlyBSD
+syscons or vt framebuffer devices.
 This is a non-accelerated driver. 
-The following framebuffer depths are supported: 1, 8, 16 and 24, given
-that the wsdisplay device underneath supports them.
+The following framebuffer depths are supported: 8, 16 and 24, given
+that the framebuffer device underneath supports them.
 .br
-A StaticGray monochrome visual is provided for depth 1,
-all visual types are supported for depth 8 and a TrueColor visual is
+All visual types are supported for depth 8 and a TrueColor visual is
 supported for the other depths.
 Multi-head configurations are supported.
+.br
+On DragonFlyBSD this driver additionally implements DPMS screen power
+management when supported by the underlying driver (currently
+amdgpu(__drivermansuffix__), radeon(__drivermansuffix__). and
+i915(__drivermansuffix__).
 .SH SUPPORTED HARDWARE
 The
 .B scfb
-driver supports all hardware where a wsdisplay framebuffer driver
-is available on OpenBSD and NetBSD.
-On OpenBSD, currently this includes OpenBSD/macppc, OpenBSD/sgi,
-OpenBSD/sparc, OpenBSD/sparc64 and OpenBSD/alpha on TGA graphics cards.
-It also supports NetBSD/i386 using wsdisplay on vesafb(4).
+driver supports all hardware where a syscons/vt framebuffer driver
+is available on FreeBSD and DragonFlyBSD.
 .SH CONFIGURATION DETAILS
 Please refer to __xconfigfile__(__filemansuffix__) for general configuration
 details.
@@ -77,11 +78,6 @@ The following driver options are supported in the
 .B Device
 section:
 .TP
-.BI "Option \*qdevice\*q \*q" string \*q
-The wsdisplay framebuffer device to use.
-Default for OpenBSD: \fI/dev/ttyC0\fP.
-Default for NetBSD: \fI/dev/ttyE0\fP.
-.TP
 .BI "Option \*qShadowFB\*q \*q" boolean \*q
 Enable or disable use of the shadow framebuffer layer.
 See shadowfb(__drivermansuffix__) for further information.
@@ -97,6 +93,6 @@ Implies use of the shadow framebuffer layer.
 Default: off.
 .SH "SEE ALSO"
 __xservername__(1), __xconfigfile__(__filemansuffix__), xorgconfig(1), Xserver(1),
-X(__miscmansuffix__), wsdisplay(__drivermansuffix__)
+X(__miscmansuffix__), syscons(__drivermansuffix__), vt(__drivermansuffix__)
 .SH AUTHORS
 Authors include: Matthieu Herrb, Gerd Knorr, Michel Dänzer, Geert Uytterhoeven
