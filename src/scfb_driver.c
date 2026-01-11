@@ -70,6 +70,10 @@
 #include "xf86xv.h"
 #endif
 
+#if defined(__DragonFly__) && defined(DPMSExtension)
+#include <X11/extensions/dpmsconst.h>
+#endif
+
 #undef	DEBUG
 #define	DEBUG	1
 
@@ -101,6 +105,9 @@ static void ScfbLeaveVT(ScrnInfoPtr arg);
 static Bool ScfbSwitchMode(ScrnInfoPtr arg, DisplayModePtr mode);
 static int ScfbValidMode(ScrnInfoPtr, DisplayModePtr, Bool, int);
 static void ScfbLoadPalette(ScrnInfoPtr, int, int *, LOCO *, VisualPtr);
+#if defined(__DragonFly__) && defined(DPMSExtension)
+static void ScfbDPMSSet(ScrnInfoPtr, int, int);
+#endif
 static Bool ScfbSaveScreen(ScreenPtr, int);
 static void ScfbSave(ScrnInfoPtr);
 static void ScfbRestore(ScrnInfoPtr);
@@ -686,6 +693,10 @@ ScfbScreenInit(ScreenPtr pScreen, int argc, char **argv)
 	}
 	fPtr->fbmem_len = len;
 
+#if defined(__DragonFly__) && defined(DPMSExtension)
+	xf86DPMSInit(pScreen, ScfbDPMSSet, 0);
+#endif
+
 	ScfbSave(pScrn);
 	pScrn->vtSema = TRUE;
 
@@ -959,6 +970,39 @@ ScfbLoadPalette(ScrnInfoPtr pScrn, int numColors, int *indices,
 	/* TODO */
 }
 
+#if defined(__DragonFly__) && defined(DPMSExtension)
+static void
+ScfbDPMSSet(ScrnInfoPtr pScrn, int mode, int flags)
+{
+	ScfbPtr fPtr = SCFBPTR(pScrn);
+	int state;
+
+	if (!pScrn->vtSema)
+		return;
+
+	switch (mode) {
+	case DPMSModeOn:
+		state = V_DISPLAY_ON;
+		break;
+	case DPMSModeStandby:
+		state = V_DISPLAY_STAND_BY;
+		break;
+	case DPMSModeSuspend:
+	/* No V_DISPLAY_OFF available */
+	case DPMSModeOff:
+		state = V_DISPLAY_SUSPEND;
+		break;
+	default:
+		return;
+	}
+
+	if (ioctl(fPtr->fd, FBIO_BLANK, &state) != 0) {
+		xf86DrvMsg(pScrn->scrnIndex, X_INFO,
+		    "FBIO_BLANK: %s", strerror(errno));
+	}
+}
+#endif
+
 static Bool
 ScfbSaveScreen(ScreenPtr pScreen, int mode)
 {
@@ -969,9 +1013,21 @@ ScfbSaveScreen(ScreenPtr pScreen, int mode)
 	if (!pScrn->vtSema)
 		return TRUE;
 
-	if (mode != SCREEN_SAVER_FORCER) {
-		/* TODO, if (mode) enable_screen(); else disable_screen(); */
+#if defined(__DragonFly__)
+	ScfbPtr fPtr = SCFBPTR(pScrn);
+	int state;
+
+	if (xf86IsUnblank(mode))
+		state = V_DISPLAY_ON;
+	else
+		state = V_DISPLAY_SUSPEND;
+
+	if (ioctl(fPtr->fd, FBIO_BLANK, &state) != 0) {
+		xf86DrvMsg(pScrn->scrnIndex, X_INFO,
+		    "FBIO_BLANK: %s", strerror(errno));
 	}
+#endif
+
 	TRACE_EXIT("SaveScreen");
 	return TRUE;
 }
