@@ -23,7 +23,7 @@
 # Initialize Autoconf
 AC_PREREQ([2.60])
 AC_INIT([xlibre-xf86-video-scfb],
-        [25.0.0],
+        [25.0.1-rc1],
         [https://github.com/X11Libre/xf86-video-scfb/issues],
         [xlibre-xf86-video-scfb])
 AC_CONFIG_SRCDIR([Makefile.am])
