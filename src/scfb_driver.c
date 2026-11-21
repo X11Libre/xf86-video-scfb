@@ -143,6 +143,7 @@ static int pix24bpp = 0;
 #define SCFB_VERSION_MAJOR	PACKAGE_VERSION_MAJOR
 #define SCFB_VERSION_MINOR	PACKAGE_VERSION_MINOR
 #define SCFB_VERSION_PATCH	PACKAGE_VERSION_PATCHLEVEL
+#define SCFB_VERSION_SUFFIX	PACKAGE_VERSION_SUFFIX
 
 _X_EXPORT DriverRec SCFB = {
 	SCFB_VERSION,
@@ -189,6 +190,10 @@ static XF86ModuleVersionInfo ScfbVersRec = {
 };
 
 _X_EXPORT XF86ModuleData scfbModuleData = { &ScfbVersRec, ScfbSetup, NULL };
+
+#ifdef XF86_MODULE_VERSION_SUFFIX
+XF86_MODULE_VERSION_SUFFIX(scfb, SCFB_VERSION_SUFFIX);
+#endif
 
 static void *
 ScfbSetup(void *module, void *opts, int *errmaj, int *errmin)
